@@ -11,39 +11,35 @@ export const signup = catchAsync(async (req, res) => {
     const { name, password, email, isSuspended } = req.body;
     const existUser = await User.findOne({ email });
     if (existUser) {
-        return res.status(400).json({ message: "Success", data: "Already Exist" });
+        return res.json({ msg: "Email Already Exist", status: false });
 
     }
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = await User.create({ name: name, email: email, password: hashedPassword, isSuspended: isSuspended });
     const token = jwt.sign({ email: user.email, id: user._id }, JWT_SECRET, { expiresIn: "1h" });
 
-    res.status(202).json([
-        { message: "Success", data: user, token },
-        { rel: "self", method: "GET", href: "http://127.0.0.1" },
-        {
-            rel: "create",
-            method: "POST",
-            title: "Create Person",
-            href: "http://127.0.0.1/person",
-        },
-    ]);
+    res.json(
+        { status: true, user, token },
+
+    );
 });
 export const signin = catchAsync(async (req, res) => {
-    const { password, email } = req.body;
+    const { email,
+        password } = req.body;
+    console.log(req.body);
     const existUser = await User.findOne({ email });
     const isPasswordCorrect = await bcrypt.compare(password, existUser.password);
     if (!existUser || !isPasswordCorrect) {
-        return res.status(400).json({ message: "Success", data: "User Email or password are not valid" });
+        return res.json({ msg: "Success", status: false, data: "User Email or password are not valid" });
     }
     const token = jwt.sign({ email: existUser.email, id: existUser._id }, JWT_SECRET, { expiresIn: "1h" });
 
-    res.status(202).json({ message: "Success", data: existUser, token });
+    res.json({ message: "Success", status: true, data: existUser, token });
 });
 
 export const notSuspend = catchAsync(async (req, res) => {
     const notSuspendUsers = await User.find().where('isSuspended').equals(false);
-    res.status(202).json({ message: "Success", data: notSuspendUsers });
+    res.json({ msg: "Success", data: notSuspendUsers });
 })
 export const suspend = catchAsync(async (req, res) => {
     const SuspendUsers = await User.find().where('isSuspended').equals(true);

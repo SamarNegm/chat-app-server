@@ -3,7 +3,7 @@ import { signup, signin, suspend, notSuspend, makeSuspend, makeNotSuspend } from
 const router = express.Router();
 
 router.post('/signup', signup);
-router.get('/signin', signin);
+router.post('/signin', signin);
 router.get('/suspend', suspend);
 router.get('/notSuspend', notSuspend);
 router.post('/:id/suspend', makeSuspend);
