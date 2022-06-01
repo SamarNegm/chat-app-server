@@ -55,4 +55,18 @@ export const makeSuspend = catchAsync(async (req, res) => {
     const { id } = req.params;
     const SuspendUsers = await User.findByIdAndUpdate(id, { 'isSuspended': true }, { new: true })
     res.status(202).json({ message: "Success", data: SuspendUsers });
-}) 
+})
+export const setAvatar = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    console.log(
+        id,
+        req.body.image
+    );
+    const user = await User.findByIdAndUpdate(id,
+        { 'avatarImage': req.body.image, 'isAvatarImageSet': true },
+        { new: true })
+    return res.json({
+        isSet: user.isAvatarImageSet,
+        image: user.avatarImage,
+    });
+});
