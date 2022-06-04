@@ -36,7 +36,11 @@ export const signin = catchAsync(async (req, res) => {
 
     res.json({ message: "Success", status: true, data: existUser, token });
 });
+export const getAllUsersNotMe = catchAsync(async (req, res) => {
 
+    const users = await User.find({ _id: { $ne: req.params.id } }).select("-password");
+    res.json(users);
+});
 export const notSuspend = catchAsync(async (req, res) => {
     const notSuspendUsers = await User.find().where('isSuspended').equals(false);
     res.json({ msg: "Success", data: notSuspendUsers });
