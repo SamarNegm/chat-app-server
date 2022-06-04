@@ -52,6 +52,16 @@ module.exports.getAllUsersNotMe = catchAsync(async (req, res) => {
     ]);
     return res.json(users);
 });
+
+
+module.exports.logout = catchAsync(async (req, res) => {
+    if (!req.params.id) return res.json({ msg: "User id is required " });
+    onlineUsers.delete(req.params.id);
+    return res.status(200).send();
+});
+
+
+
 module.exports.notSuspend = catchAsync(async (req, res) => {
     const notSuspendUsers = await User.find().where('isSuspended').equals(false);
     res.json({ msg: "Success", data: notSuspendUsers });
