@@ -1,12 +1,13 @@
-import express from 'express';
-import User from './../models/User.js'
-import { catchAsync } from '../utils/utils.js';
-import jwt from 'jsonwebtoken';
-import bcrypt from "bcryptjs";
-import dotenv from 'dotenv';
+const express = require("express");
+const User = require('./../models/User.js');
+const { catchAsync } = require('../utils/utils.js');
+const jwt = require('jsonwebtoken');
+const bcrypt = require("bcryptjs");
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 dotenv.config();
 const { JWT_SECRET } = process.env;
-export const signup = catchAsync(async (req, res) => {
+module.exports.signup = catchAsync(async (req, res) => {
     console.log("Signup");
     const { name, password, email, isSuspended } = req.body;
     const existUser = await User.findOne({ email });
@@ -23,7 +24,7 @@ export const signup = catchAsync(async (req, res) => {
 
     );
 });
-export const signin = catchAsync(async (req, res) => {
+module.exports.signin = catchAsync(async (req, res) => {
     const { email,
         password } = req.body;
     console.log(req.body);
@@ -36,31 +37,41 @@ export const signin = catchAsync(async (req, res) => {
 
     res.json({ message: "Success", status: true, data: existUser, token });
 });
-export const getAllUsersNotMe = catchAsync(async (req, res) => {
+module.exports.getAllUsersNotMe = catchAsync(async (req, res) => {
+    console.log(req.params.id);
+    const id = mongoose.Types.ObjectId(req.params.id.trim());
+    console.log(
 
-    const users = await User.find({ _id: { $ne: req.params.id } }).select("-password");
-    res.json(users);
+        id
+    )
+    const users = await User.find({ _id: { $ne: id } }).select([
+        "email",
+        "username",
+        "avatarImage",
+        "_id",
+    ]);
+    return res.json(users);
 });
-export const notSuspend = catchAsync(async (req, res) => {
+module.exports.notSuspend = catchAsync(async (req, res) => {
     const notSuspendUsers = await User.find().where('isSuspended').equals(false);
     res.json({ msg: "Success", data: notSuspendUsers });
 })
-export const suspend = catchAsync(async (req, res) => {
+module.exports.suspend = catchAsync(async (req, res) => {
     const SuspendUsers = await User.find().where('isSuspended').equals(true);
     res.status(202).json({ message: "Success", data: SuspendUsers });
 })
 
-export const makeNotSuspend = catchAsync(async (req, res) => {
+module.exports.makeNotSuspend = catchAsync(async (req, res) => {
     const { id } = req.params;
     const notSuspendUsers = await User.findByIdAndUpdate(id, { 'isSuspended': false }, { new: true })
     res.status(202).json({ message: "Success", data: notSuspendUsers });
 })
-export const makeSuspend = catchAsync(async (req, res) => {
+module.exports.makeSuspend = catchAsync(async (req, res) => {
     const { id } = req.params;
     const SuspendUsers = await User.findByIdAndUpdate(id, { 'isSuspended': true }, { new: true })
     res.status(202).json({ message: "Success", data: SuspendUsers });
 })
-export const setAvatar = catchAsync(async (req, res) => {
+module.exports.setAvatar = catchAsync(async (req, res) => {
     const { id } = req.params;
     console.log(
         id,

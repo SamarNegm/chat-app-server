@@ -1,7 +1,7 @@
-import Message from '../models/Message.js';
-import { catchAsync } from '../utils/utils.js'
+const Message = require('../models/Message.js');
+const { catchAsync } = require('../utils/utils.js');
 
-export const sendMessage = catchAsync(async (req, res) => {
+module.exports.sendMessage = catchAsync(async (req, res) => {
     const { from, to, message } = req.body;
     const data = await Message.create({
         message: message,
@@ -13,7 +13,7 @@ export const sendMessage = catchAsync(async (req, res) => {
 
 })
 
-export const getMessages = catchAsync(async (req, res) => {
+module.exports.getMessages = catchAsync(async (req, res) => {
     const { from, to } = req.body;
     const messages = await Message.find({
         users: {
